@@ -99,33 +99,6 @@ def make_pipeline(state):
         output='.primary.primerclipped.bam')
         .follows('index_bam'))
 
-    # # Sort the BAM file using Picard
-    # pipeline.transform(
-    #     task_func=stages.sort_bam_picard,
-    #     name='sort_bam_picard',
-    #     input=output_from('clip_bam'),
-    #     filter=suffix('.clip.bam'),
-    #     output='.sort.bam')
-
-    # # samtools index sorted bam file
-    # pipeline.transform(
-    #     task_func=stages.index_sort_bam_picard,
-    #     name='index_sort_bam_picard',
-    #     input=output_from('clip_bam'),
-    #     filter=suffix('.primerclipped.bam'),
-    #     output='.primerclipped.bam.bai')
-
-    # # Coverage using Picard
-    # (pipeline.transform(
-    #     task_func=stages.target_coverage,
-    #     name='target_coverage',
-    #     input=output_from('sort_bam_picard'),
-    #     # filter=suffix('.sort.bam'),
-    #     filter=formatter(
-    #         '.+/(?P<sample>[a-zA-Z0-9-_]+).sort.bam'),
-    #     output='coverage/{sample[0]}.coverage.txt')
-    #     .follows('sort_bam_picard'))
-
     ###### GATK VARIANT CALLING ######
     # Call variants using GATK
     pipeline.transform(
@@ -160,44 +133,6 @@ def make_pipeline(state):
        filter=suffix('.raw.vcf'),
        output='.raw.annotate.vcf')
 
-    # ------- RECAL
-    # # SNP recalibration using GATK
-    # pipeline.transform(
-    #     task_func=stages.snp_recalibrate_gatk,
-    #     name='snp_recalibrate_gatk',
-    #     input=output_from('variant_annotator_gatk'),
-    #     filter=suffix('.raw.annotate.vcf'),
-    #     output=['.snp_recal', '.snp_tranches', '.snp_plots.R'])
-    #
-    # # Apply SNP recalibration using GATK
-    # (pipeline.transform(
-    #     task_func=stages.apply_snp_recalibrate_gatk,
-    #     name='apply_snp_recalibrate_gatk',
-    #     input=output_from('variant_annotator_gatk'),
-    #     filter=suffix('.raw.annotate.vcf'),
-    #     add_inputs=add_inputs(['variants/ALL.snp_recal', 'variants/ALL.snp_tranches']),
-    #     output='.recal_SNP.vcf')
-    #     .follows('snp_recalibrate_gatk'))
-    #
-    # # INDEL recalibration using GATK
-    # pipeline.transform(
-    #     task_func=stages.indel_recalibrate_gatk,
-    #     name='indel_recalibrate_gatk',
-    #     input=output_from('apply_snp_recalibrate_gatk'),
-    #     filter=suffix('.recal_SNP.vcf'),
-    #     output=['.indel_recal', '.indel_tranches', '.indel_plots.R'])
-    #
-    # # Apply INDEL recalibration using GATK
-    # (pipeline.transform(
-    #     task_func=stages.apply_indel_recalibrate_gatk,
-    #     name='apply_indel_recalibrate_gatk',
-    #     input=output_from('apply_snp_recalibrate_gatk'),
-    #     filter=suffix('.recal_SNP.vcf'),
-    #     add_inputs=add_inputs(
-    #         ['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-    #     output='.raw.annotate.vqsr.vcf')
-    #     .follows('indel_recalibrate_gatk'))
-
     # Apply VariantFiltration using GATK
     pipeline.transform(
         task_func=stages.apply_variant_filtration_gatk_lenient,
@@ -205,8 +140,6 @@ def make_pipeline(state):
         input=output_from('variant_annotator_gatk'),
         filter=suffix('.raw.annotate.vcf'),
         output='.raw.annotate.filtered_lenient.vcf')
-
-    # ------- RECAL
 
     # -------- VEP ----------
     # Apply NORM
@@ -302,14 +235,5 @@ def make_pipeline(state):
         filter=suffix('.vep.anno.snpeff.vcf.gz'),
         output='.annotated.vcf')
         .follows('apply_tabix'))
-
-    # Apply summarize multi coverage
-    # (pipeline.merge(
-    #     task_func=stages.apply_multicov,
-    #     name='apply_multicov',
-    #     input=output_from('primary_bam'),
-    #     # filter=suffix('.primary.bam'),
-    #     output='coverage/all.multicov.txt')
-    #     .follows('index_bam'))
 
     return pipeline
