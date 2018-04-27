@@ -100,46 +100,7 @@ def make_pipeline(state):
         .follows('index_bam'))
 
     ###### GATK VARIANT CALLING ######
-    # Call variants using GATK
-    pipeline.transform(
-        task_func=stages.call_haplotypecaller_gatk,
-        name='call_haplotypecaller_gatk',
-        input=output_from('clip_bam'),
-        # filter=suffix('.merged.dedup.realn.bam'),
-        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-_]+).primary.primerclipped.bam'),
-        output='variants/gatk/{sample[0]}.g.vcf')
-        # .follows('index_sort_bam_picard'))
-
-    # Combine G.VCF files for all samples using GATK
-    pipeline.merge(
-        task_func=stages.combine_gvcf_gatk,
-        name='combine_gvcf_gatk',
-        input=output_from('call_haplotypecaller_gatk'),
-        output='variants/gatk/ALL.combined.vcf')
-
-    # Genotype G.VCF files using GATK
-    pipeline.transform(
-        task_func=stages.genotype_gvcf_gatk,
-        name='genotype_gvcf_gatk',
-        input=output_from('combine_gvcf_gatk'),
-        filter=suffix('.combined.vcf'),
-        output='.raw.vcf')
-
-    # Annotate VCF file using GATK
-    pipeline.transform(
-       task_func=stages.variant_annotator_gatk,
-       name='variant_annotator_gatk',
-       input=output_from('genotype_gvcf_gatk'),
-       filter=suffix('.raw.vcf'),
-       output='.raw.annotate.vcf')
-
-    # Apply VariantFiltration using GATK
-    pipeline.transform(
-        task_func=stages.apply_variant_filtration_gatk_lenient,
-        name='apply_variant_filtration_gatk_lenient',
-        input=output_from('variant_annotator_gatk'),
-        filter=suffix('.raw.annotate.vcf'),
-        output='.raw.annotate.filtered_lenient.vcf')
+    ###### GATK VARIANT CALLING ######    
 
     # -------- VEP ----------
     # Apply NORM
@@ -183,7 +144,6 @@ def make_pipeline(state):
         .follows('apply_snpeff'))
 
     # -------- VEP ----------
-    ###### GATK VARIANT CALLING ######
 
     # Concatenate undr_rover vcf files
     pipeline.merge(
