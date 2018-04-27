@@ -44,7 +44,8 @@ def make_pipeline(state):
         # Add an "extra" argument to the state (beyond the inputs and outputs)
         # which is the sample name. This is needed within the stage for finding out
         # sample specific configuration options
-        extras=['{sample[0]}', '{tumor[0]}', '{readid[0]}', '{lane[0]}', '{lib[0]}'],
+        # extras=['{sample[0]}', '{tumor[0]}', '{readid[0]}', '{lane[0]}', '{lib[0]}'],
+        extras=['{sample[0]}', '{tumor[0]}', '{lane[0]}', '{lib[0]}'],
         # The output file name is the sample name with a .bam extension.
         output='alignments/{sample[0]}/{sample[0]}_{tumor[0]}.bam')
 
@@ -61,8 +62,9 @@ def make_pipeline(state):
 
         add_inputs=add_inputs(
             '{path[0]}/{sample[0]}-{tumor[0]}_{lane[0]}_R2_{lib[0]}.fastq'),
-        # extras=['{sample[0]}', '{readid[0]}', '{lane[0]}', '{lib[0]}'],
-        extras=['{sample[0]}', '{tumor[0]}', '{readid[0]}'],
+
+        # extras=['{sample[0]}', '{tumor[0]}', '{readid[0]}'],
+        extras=['{sample[0]}', '{tumor[0]}'],
 
         # The output file name is the sample name with a .bam extension.
         output='variants/undr_rover/{sample[0]}_{tumor[0]}.vcf')
