@@ -33,13 +33,13 @@ def make_pipeline(state):
         # Hi-Plex example: OHI031002-P02F04_S318_L001_R1_001.fastq
         # new sample name = OHI031002-P02F04
         filter=formatter(
-            '.+/(?P<sample>[a-zA-Z0-9-]+)_(?P<readid>[a-zA-Z0-9-]+)_(?P<lane>[a-zA-Z0-9]+)_R1_(?P<lib>[a-zA-Z0-9-:]+).fastq'),
+            '.+/(?P<sample>[a-zA-Z0-9-]+)-(?P<tumor>[TN]+)_(?P<readid>[a-zA-Z0-9-]+)_(?P<lane>[a-zA-Z0-9]+)_R1_(?P<lib>[a-zA-Z0-9-:]+).fastq'),
 
         # Add one more inputs to the stage:
         #    1. The corresponding R2 FASTQ file
         # Hi-Plex example: OHI031002-P02F04_S318_L001_R2_001.fastq
         add_inputs=add_inputs(
-            '{path[0]}/{sample[0]}_{tumor[0]}_{readid[0]}_{lane[0]}_R2_{lib[0]}.fastq'),
+            '{path[0]}/{sample[0]}-{tumor[0]}_{readid[0]}_{lane[0]}_R2_{lib[0]}.fastq'),
 
         # Add an "extra" argument to the state (beyond the inputs and outputs)
         # which is the sample name. This is needed within the stage for finding out
@@ -60,7 +60,7 @@ def make_pipeline(state):
             '.+/(?P<sample>[a-zA-Z0-9-]+)-(?P<tumor>[TN]+)_(?P<readid>[a-zA-Z0-9-]+)_(?P<lane>[a-zA-Z0-9]+)_R1_(?P<lib>[a-zA-Z0-9-:]+).fastq'),
 
         add_inputs=add_inputs(
-            '{path[0]}/{sample[0]}_{tumor[0]}_{readid[0]}_{lane[0]}_R2_{lib[0]}.fastq'),
+            '{path[0]}/{sample[0]}-{tumor[0]}_{readid[0]}_{lane[0]}_R2_{lib[0]}.fastq'),
         # extras=['{sample[0]}', '{readid[0]}', '{lane[0]}', '{lib[0]}'],
         extras=['{sample[0]}', '{tumor[0]}', '{readid[0]}'],
 
