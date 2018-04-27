@@ -100,100 +100,100 @@ def make_pipeline(state):
         .follows('index_bam'))
 
     ###### GATK VARIANT CALLING ######
-    ###### GATK VARIANT CALLING ######    
+    ###### GATK VARIANT CALLING ######
 
     # -------- VEP ----------
-    # Apply NORM
-    (pipeline.transform(
-        task_func=stages.apply_vt,
-        name='apply_vt',
-        input=output_from('apply_variant_filtration_gatk_lenient'),
-        filter=suffix('.raw.annotate.filtered_lenient.vcf'),
-        # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-        output='.raw.annotate.filtered_lenient.norm.vcf')
-        .follows('apply_variant_filtration_gatk_lenient'))
-
-    # Apply VEP
-    (pipeline.transform(
-        task_func=stages.apply_vep,
-        name='apply_vep',
-        input=output_from('apply_vt'),
-        filter=suffix('.raw.annotate.filtered_lenient.norm.vcf'),
-        # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-        output='.raw.annotate.filtered_lenient.norm.vep.vcf')
-        .follows('apply_vt'))
-
-    # Apply SnpEff
-    (pipeline.transform(
-        task_func=stages.apply_snpeff,
-        name='apply_snpeff',
-        input=output_from('apply_vep'),
-        filter=suffix('.raw.annotate.filtered_lenient.norm.vep.vcf'),
-        # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-        output='.raw.annotate.filtered_lenient.norm.vep.snpeff.vcf')
-        .follows('apply_vep'))
-
-    # Apply vcfanno
-    (pipeline.transform(
-        task_func=stages.apply_vcfanno,
-        name='apply_vcfanno',
-        input=output_from('apply_snpeff'),
-        filter=suffix('.raw.annotate.filtered_lenient.norm.vep.snpeff.vcf'),
-        # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-        output='.annotated.vcf')
-        .follows('apply_snpeff'))
-
-    # -------- VEP ----------
-
-    # Concatenate undr_rover vcf files
-    pipeline.merge(
-        task_func=stages.apply_cat_vcf,
-        name='apply_cat_vcf',
-        input=output_from('apply_undr_rover'),
-        output='variants/undr_rover/ur.vcf.gz')
-
-    # Apple VEP on concatenated undr_rover vcf file
-    (pipeline.transform(
-        task_func=stages.apply_vep,
-        name='apply_vep_ur',
-        input=output_from('apply_cat_vcf'),
-        filter=suffix('.vcf.gz'),
-        output='.vep.vcf')
-        .follows('apply_cat_vcf'))
-
-    # Apply vcfanno on concatenated/vep undr_rover vcf file
-    (pipeline.transform(
-        task_func=stages.apply_vcfanno,
-        name='apply_vcfanno_ur',
-        input=output_from('apply_vep_ur'),
-        filter=suffix('.vep.vcf'),
-        output='.vep.anno.vcf')
-        .follows('apply_vep_ur'))
-
-    # Apply snpeff
-    (pipeline.transform(
-        task_func=stages.apply_snpeff,
-        name='apply_snpeff_ur',
-        input=output_from('apply_vcfanno_ur'),
-        filter=suffix('.vep.anno.vcf'),
-        output='.vep.anno.snpeff.vcf.gz')
-        .follows('apply_vcfanno_ur'))
-
-    # Apply tabix
-    pipeline.transform(
-        task_func=stages.apply_tabix,
-        name='apply_tabix',
-        input=output_from('apply_snpeff_ur'),
-        filter=suffix('.vep.anno.snpeff.vcf.gz'),
-        output='.vep.anno.snpeff.vcf.gz.tbi')
-
-    # Apply HomopolymerRun
-    (pipeline.transform(
-        task_func=stages.apply_homopolymer_ann,
-        name='apply_homopolymer_ann',
-        input=output_from('apply_snpeff_ur'),
-        filter=suffix('.vep.anno.snpeff.vcf.gz'),
-        output='.annotated.vcf')
-        .follows('apply_tabix'))
+    # # Apply NORM
+    # (pipeline.transform(
+    #     task_func=stages.apply_vt,
+    #     name='apply_vt',
+    #     input=output_from('apply_variant_filtration_gatk_lenient'),
+    #     filter=suffix('.raw.annotate.filtered_lenient.vcf'),
+    #     # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
+    #     output='.raw.annotate.filtered_lenient.norm.vcf')
+    #     .follows('apply_variant_filtration_gatk_lenient'))
+    #
+    # # Apply VEP
+    # (pipeline.transform(
+    #     task_func=stages.apply_vep,
+    #     name='apply_vep',
+    #     input=output_from('apply_vt'),
+    #     filter=suffix('.raw.annotate.filtered_lenient.norm.vcf'),
+    #     # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
+    #     output='.raw.annotate.filtered_lenient.norm.vep.vcf')
+    #     .follows('apply_vt'))
+    #
+    # # Apply SnpEff
+    # (pipeline.transform(
+    #     task_func=stages.apply_snpeff,
+    #     name='apply_snpeff',
+    #     input=output_from('apply_vep'),
+    #     filter=suffix('.raw.annotate.filtered_lenient.norm.vep.vcf'),
+    #     # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
+    #     output='.raw.annotate.filtered_lenient.norm.vep.snpeff.vcf')
+    #     .follows('apply_vep'))
+    #
+    # # Apply vcfanno
+    # (pipeline.transform(
+    #     task_func=stages.apply_vcfanno,
+    #     name='apply_vcfanno',
+    #     input=output_from('apply_snpeff'),
+    #     filter=suffix('.raw.annotate.filtered_lenient.norm.vep.snpeff.vcf'),
+    #     # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
+    #     output='.annotated.vcf')
+    #     .follows('apply_snpeff'))
+    #
+    # # -------- VEP ----------
+    #
+    # # Concatenate undr_rover vcf files
+    # pipeline.merge(
+    #     task_func=stages.apply_cat_vcf,
+    #     name='apply_cat_vcf',
+    #     input=output_from('apply_undr_rover'),
+    #     output='variants/undr_rover/ur.vcf.gz')
+    #
+    # # Apple VEP on concatenated undr_rover vcf file
+    # (pipeline.transform(
+    #     task_func=stages.apply_vep,
+    #     name='apply_vep_ur',
+    #     input=output_from('apply_cat_vcf'),
+    #     filter=suffix('.vcf.gz'),
+    #     output='.vep.vcf')
+    #     .follows('apply_cat_vcf'))
+    #
+    # # Apply vcfanno on concatenated/vep undr_rover vcf file
+    # (pipeline.transform(
+    #     task_func=stages.apply_vcfanno,
+    #     name='apply_vcfanno_ur',
+    #     input=output_from('apply_vep_ur'),
+    #     filter=suffix('.vep.vcf'),
+    #     output='.vep.anno.vcf')
+    #     .follows('apply_vep_ur'))
+    #
+    # # Apply snpeff
+    # (pipeline.transform(
+    #     task_func=stages.apply_snpeff,
+    #     name='apply_snpeff_ur',
+    #     input=output_from('apply_vcfanno_ur'),
+    #     filter=suffix('.vep.anno.vcf'),
+    #     output='.vep.anno.snpeff.vcf.gz')
+    #     .follows('apply_vcfanno_ur'))
+    #
+    # # Apply tabix
+    # pipeline.transform(
+    #     task_func=stages.apply_tabix,
+    #     name='apply_tabix',
+    #     input=output_from('apply_snpeff_ur'),
+    #     filter=suffix('.vep.anno.snpeff.vcf.gz'),
+    #     output='.vep.anno.snpeff.vcf.gz.tbi')
+    #
+    # # Apply HomopolymerRun
+    # (pipeline.transform(
+    #     task_func=stages.apply_homopolymer_ann,
+    #     name='apply_homopolymer_ann',
+    #     input=output_from('apply_snpeff_ur'),
+    #     filter=suffix('.vep.anno.snpeff.vcf.gz'),
+    #     output='.annotated.vcf')
+    #     .follows('apply_tabix'))
 
     return pipeline
