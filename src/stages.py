@@ -87,14 +87,14 @@ class Stages(object):
         # print output
         pass
 
-    def align_bwa(self, inputs, bam_out, sample_id, read_id, lane, lib):
+    def align_bwa(self, inputs, bam_out, sample_id, tumor_id, read_id, lane, lib):
         # def align_bwa(self, inputs, bam_out, sample_id):
         '''Align the paired end fastq files to the reference genome using bwa'''
         fastq_read1_in, fastq_read2_in = inputs
         cores = self.get_stage_options('align_bwa', 'cores')
-        safe_make_dir('alignments/{sample}_{readid}'.format(sample=sample_id, readid=read_id))
-        read_group = '"@RG\\tID:{readid}\\tSM:{sample}_{readid}\\tPU:lib1\\tLN:{lane}\\tPL:Illumina"' \
-            .format(readid=read_id, lib=lib, lane=lane, sample=sample_id)
+        safe_make_dir('alignments/{sample}'.format(sample=sample_id))
+        read_group = '"@RG\\tID:{readid}\\tSM:{sample}_{tumor_id}_{readid}\\tPU:lib1\\tLN:{lane}\\tPL:Illumina"' \
+            .format(readid=read_id, lib=lib, lane=lane, sample=sample_id, tumor_id=tumor_id)
         command = 'bwa mem -M -t {cores} -R {read_group} {reference} {fastq_read1} {fastq_read2} ' \
                   '| samtools view -b -h -o {bam} -' \
                   .format(cores=cores,
