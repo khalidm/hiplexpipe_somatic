@@ -105,37 +105,35 @@ class Stages(object):
                           bam=bam_out)
         run_stage(self.state, 'align_bwa', command)
 
-    def apply_undr_rover(self, inputs, vcf_output, sample_id, readid):
-        # def align_bwa(self, inputs, bam_out, sample_id):
-        '''Apply undr_rover to call variants from paired end fastq files'''
-        fastq_read1_in, fastq_read2_in = inputs
-        cores = self.get_stage_options('apply_undr_rover', 'cores')
-        safe_make_dir('variants/undr_rover')
-        safe_make_dir('variants/undr_rover/coverdir')
-        coverfile = "variants/undr_rover/coverdir/" + sample_id + "_" + readid + ".coverage"
-        # read_group = '"@RG\\tID:{readid}\\tSM:{sample}_{readid}\\tPU:lib1\\tLN:{lane}\\tPL:Illumina"' \
-            # .format(readid=read_id, lib=lib, lane=lane, sample=sample_id)
-
-        command = 'undr_rover --primer_coords {coord_file} ' \
-                  '--primer_sequences {primer_file} ' \
-                  '--reference {reference} ' \
-                  '--out {vcf_output} ' \
-                  '--coverfile {coverfile} ' \
-                  '--proportionthresh {proportionthresh} ' \
-                  '--absthresh {absthresh} ' \
-                  '--max_variants {maxvariants} ' \
-                  '{fastq_read1} {fastq_read2}'.format(
-                        coord_file=self.coord_file, primer_file=self.primer_file,
-                        reference=self.reference,
-                        vcf_output=vcf_output,
-                        #coverdir=self.coverdir,
-                        proportionthresh=self.proportionthresh,
-                        absthresh=self.absthresh,
-                        maxvariants=self.maxvariants,
-                        coverfile=coverfile,
-                        fastq_read1=fastq_read1_in,
-                        fastq_read2=fastq_read2_in)
-        run_stage(self.state, 'apply_undr_rover', command)
+    # def apply_undr_rover(self, inputs, vcf_output, sample_id, readid):
+    #     # def align_bwa(self, inputs, bam_out, sample_id):
+    #     '''Apply undr_rover to call variants from paired end fastq files'''
+    #     fastq_read1_in, fastq_read2_in = inputs
+    #     cores = self.get_stage_options('apply_undr_rover', 'cores')
+    #     safe_make_dir('variants/undr_rover')
+    #     safe_make_dir('variants/undr_rover/coverdir')
+    #     coverfile = "variants/undr_rover/coverdir/" + sample_id + "_" + readid + ".coverage"
+    #
+    #     command = 'undr_rover --primer_coords {coord_file} ' \
+    #               '--primer_sequences {primer_file} ' \
+    #               '--reference {reference} ' \
+    #               '--out {vcf_output} ' \
+    #               '--coverfile {coverfile} ' \
+    #               '--proportionthresh {proportionthresh} ' \
+    #               '--absthresh {absthresh} ' \
+    #               '--max_variants {maxvariants} ' \
+    #               '{fastq_read1} {fastq_read2}'.format(
+    #                     coord_file=self.coord_file, primer_file=self.primer_file,
+    #                     reference=self.reference,
+    #                     vcf_output=vcf_output,
+    #                     #coverdir=self.coverdir,
+    #                     proportionthresh=self.proportionthresh,
+    #                     absthresh=self.absthresh,
+    #                     maxvariants=self.maxvariants,
+    #                     coverfile=coverfile,
+    #                     fastq_read1=fastq_read1_in,
+    #                     fastq_read2=fastq_read2_in)
+    #     run_stage(self.state, 'apply_undr_rover', command)
 
     def clip_bam(self, bam_in, sorted_bam_out):
         '''Clip the BAM file using Bamclipper'''

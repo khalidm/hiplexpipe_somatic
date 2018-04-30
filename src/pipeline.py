@@ -44,29 +44,29 @@ def make_pipeline(state):
         # Add an "extra" argument to the state (beyond the inputs and outputs)
         # which is the sample name. This is needed within the stage for finding out
         # sample specific configuration options
-        extras=['{sample[0]}', '{tumor[0]}', '{readid[0]}', '{lane[0]}', '{lib[0]}'],        
+        extras=['{sample[0]}', '{tumor[0]}', '{readid[0]}', '{lane[0]}', '{lib[0]}'],
         # The output file name is the sample name with a .bam extension.
         output='alignments/{sample[0]}/{sample[0]}_{tumor[0]}.bam')
 
     # Call variants using undr_rover
-    pipeline.transform(
-        task_func=stages.apply_undr_rover,
-        name='apply_undr_rover',
-        input=output_from('original_fastqs'),
-        # Match the R1 (read 1) FASTQ file and grab the path and sample name.
-        # This will be the first input to the stage.
-        # e.g. N999-B000-T_HNGTVAFXX_L001_R2_001.fastq
-        filter=formatter(
-            '.+/(?P<sample>[a-zA-Z0-9-]+)-(?P<tumor>[TN]+)_(?P<readid>[a-zA-Z0-9-]+)_(?P<lane>[a-zA-Z0-9]+)_R1_(?P<lib>[a-zA-Z0-9-:]+).fastq'),
-
-        add_inputs=add_inputs(
-            '{path[0]}/{sample[0]}-{tumor[0]}_{lane[0]}_R2_{lib[0]}.fastq'),
-
-        # extras=['{sample[0]}', '{tumor[0]}', '{readid[0]}'],
-        extras=['{sample[0]}', '{tumor[0]}'],
-
-        # The output file name is the sample name with a .bam extension.
-        output='variants/undr_rover/{sample[0]}_{tumor[0]}.vcf')
+    # pipeline.transform(
+    #     task_func=stages.apply_undr_rover,
+    #     name='apply_undr_rover',
+    #     input=output_from('original_fastqs'),
+    #     # Match the R1 (read 1) FASTQ file and grab the path and sample name.
+    #     # This will be the first input to the stage.
+    #     # e.g. N999-B000-T_HNGTVAFXX_L001_R2_001.fastq
+    #     filter=formatter(
+    #         '.+/(?P<sample>[a-zA-Z0-9-]+)-(?P<tumor>[TN]+)_(?P<readid>[a-zA-Z0-9-]+)_(?P<lane>[a-zA-Z0-9]+)_R1_(?P<lib>[a-zA-Z0-9-:]+).fastq'),
+    #
+    #     add_inputs=add_inputs(
+    #         '{path[0]}/{sample[0]}-{tumor[0]}_{lane[0]}_R2_{lib[0]}.fastq'),
+    #
+    #     # extras=['{sample[0]}', '{tumor[0]}', '{readid[0]}'],
+    #     extras=['{sample[0]}', '{tumor[0]}'],
+    #
+    #     # The output file name is the sample name with a .bam extension.
+    #     output='variants/undr_rover/{sample[0]}_{tumor[0]}.vcf')
 
     # Sort the BAM file using Picard
     pipeline.transform(
