@@ -167,11 +167,11 @@ class Stages(object):
     # coverage bam
     def call_mutect2_gatk(self, inputs, sample_id, vcf_out):
         '''Call somatic variants from using MuTect2'''
-        #safe_make_dir('variants/mutect2')
         tumor_in, normal_in = inputs
         tumor_id = sample_id + "_T"
         normal_id = sample_id + "_N"
-        safe_make_dir('variants/mutect2/{sample}'.format(sample=sample_id))
+        # safe_make_dir('variants/mutect2/{sample}'.format(sample=sample_id))
+        safe_make_dir('variants/mutect2/')
         command = "gatk mutect2 -R {reference} " \
             "-I {tumor_in} " \
             "-tumor {tumor_id} " \
