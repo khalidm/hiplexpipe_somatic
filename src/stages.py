@@ -180,7 +180,7 @@ class Stages(object):
             "--germline-resource {mutect2_gnomad} " \
             "--af-of-alleles-not-in-resource 0.00003125 " \
             "-O {out} " \
-            "--dontUseSoftClippedBases".format(reference=self.reference,
+            "--dont-use-soft-clipped-bases".format(reference=self.reference,
                         tumor_in=tumor_in,
                         normal_in=normal_in,
                         tumor_id=tumor_id,
