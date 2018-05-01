@@ -109,9 +109,9 @@ def make_pipeline(state):
         name='call_mutect2_gatk',
         input=output_from('clip_bam'),
         # filter=suffix('.merged.dedup.realn.bam'),
-        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-]+)-T.primary.primerclipped.bam'),
+        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-]+)_T.primary.primerclipped.bam'),
         add_inputs=add_inputs(
-            '{path[0]}/{sample[0]}-N.primary.primerclipped.bam'),
+            '{path[0]}/{sample[0]}_N.primary.primerclipped.bam'),
         extras=['{sample[0]}'],
         output='variants/mutect2/{sample[0]}.mutect2.vcf')
         # .follows('clip_bam')
