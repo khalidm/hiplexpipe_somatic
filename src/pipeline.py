@@ -114,7 +114,7 @@ def make_pipeline(state):
             '{path[0]}/{sample[0]}-N.primary.primerclipped.bam'),
         extras=['{sample[0]}'],
         output='variants/mutect2/{sample[0]}.mutect2.vcf')
-        # .follows('index_sort_bam_picard'))
+        .follows('clip_bam'))
 
     ###### GATK VARIANT CALLING ######
 
