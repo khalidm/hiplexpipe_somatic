@@ -172,7 +172,7 @@ class Stages(object):
         normal_id = sample_id + "_N"
         # safe_make_dir('variants/mutect2/{sample}'.format(sample=sample_id))
         safe_make_dir('variants/mutect2/')
-        command = "gatk mutect2 -R {reference} " \
+        command = "gatk Mutect2 -R {reference} " \
             "-I {tumor_in} " \
             "-tumor {tumor_id} " \
             "-I {normal_in} " \
