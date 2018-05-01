@@ -104,7 +104,7 @@ def make_pipeline(state):
     ###### GATK VARIANT CALLING - MuTect2 ######
 
     # Call somatics variants using MuTect2
-    pipeline.transform(
+    (pipeline.transform(
         task_func=stages.call_mutect2_gatk,
         name='call_mutect2_gatk',
         input=output_from('clip_bam'),
