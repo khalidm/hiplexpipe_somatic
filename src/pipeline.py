@@ -101,7 +101,21 @@ def make_pipeline(state):
         output='.primary.primerclipped.bam')
         .follows('index_bam'))
 
-    ###### GATK VARIANT CALLING ######
+    ###### GATK VARIANT CALLING - MuTect2 ######
+
+    # Call somatics variants using MuTect2
+    pipeline.transform(
+        task_func=stages.call_mutect2_gatk,
+        name='call_mutect2_gatk',
+        input=output_from('clip_bam'),
+        # filter=suffix('.merged.dedup.realn.bam'),
+        filter=formatter('.+/(?P<sample>[a-zA-Z0-9-]+)-T.primary.primerclipped.bam'),
+        add_inputs=add_inputs(
+            '{path[0]}/{sample[0]}-N.primary.primerclipped.bam'),
+        extras=['{sample[0]}'],
+        output='variants/mutect2/{sample[0]}.mutect2.vcf')
+        # .follows('index_sort_bam_picard'))
+
     ###### GATK VARIANT CALLING ######
 
     # -------- VEP ----------

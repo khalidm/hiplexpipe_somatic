@@ -60,6 +60,7 @@ class Stages(object):
         self.hrfile = self.get_options('hrfile')
         self.other_vep = self.get_options('other_vep')
         self.snpeff_path = self.get_options('snpeff_path')
+        self.mutect2_gnomad = self.get_options('mutect2_gnomad')
 
         # self.GBR_mergeGvcf = self.get_options('GBR_mergeGvcf')
         # self.FIN_mergeGvcf = self.get_options('FIN_mergeGvcf')
@@ -164,11 +165,40 @@ class Stages(object):
         run_stage(self.state, 'index_sort_bam_picard', command)
 
     # coverage bam
-    def target_coverage_bamutil(self, bam_in, coverage_out):
-        '''Calculate coverage using bamutil'''
-        command = 'bam stats --basic --in {bam_in} &> {coverage_out}'.format(
-                          bam_in=bam_in, coverage_out=coverage_out)
-        run_stage(self.state, 'target_coverage_bamutil', command)
+    def call_mutect2_gatk(self, inputs, sample_id, vcf_out):
+        '''Call somatic variants from using MuTect2'''
+        #safe_make_dir('variants/mutect2')
+        tumor_in, normal_in = inputs
+        tumor_id = sample_id + "_T"
+        normal_id = sample_id + "_N"
+        safe_make_dir('variants/mutect2/{sample}'.format(sample=sample_id))
+        gatk_args = "gatk mutect2 -R {reference} " \
+            "-I {tumor_in} " \
+            "-tumor {tumor_id} " \
+            "-I {normal_in} " \
+            "-normal {normal_id} " \
+            "--germline-resource {mutect2_gnomad} " \
+            "--af-of-alleles-not-in-resource 0.00003125 " \
+            "-O {out} " \
+            "--dontUseSoftClippedBases".format(reference=self.reference,
+                        tumor_in=tumor_in,
+                        normal_in=normal_in,
+                        tumor_id=tumor_id,
+                        normal_id=normal_id,
+                        mutect2_gnomad=self.mutect2_gnomad,
+                        out=vcf_out)
+        run_stage(self.state, 'call_mutect2_gatk', command)
+
+    # # Merge per lane bam into a single bam per sample
+    # def merge_sample_bams(self, bam_files_in, bam_out):
+    #     '''Merge per lane bam into a merged bam file'''
+    #     bam_files = ' '.join(['INPUT=' + bam for bam in bam_files_in])
+    #     picard_args = 'MergeSamFiles {bams_in} OUTPUT={merged_bam_out} ' \
+    #                   'VALIDATION_STRINGENCY=LENIENT ' \
+    #                   'MAX_RECORDS_IN_RAM=5000000 ASSUME_SORTED=True ' \
+    #                   'CREATE_INDEX=True'.format(
+    #                       bams_in=bam_files, merged_bam_out=bam_out)
+    #     self.run_picard('merge_sample_bams', picard_args)
 
     # coverage bam interval
     # def target_coverage_bamutil_interval(self, bam_in, coverage_out):
