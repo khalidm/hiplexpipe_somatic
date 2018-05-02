@@ -169,8 +169,6 @@ class Stages(object):
     def call_mutect2_gatk(self, inputs, vcf_out):
         '''Call somatic variants from using MuTect2'''
         tumor_in, normal_in = inputs
-        tumor_id = sample_id #+ "_T"
-        normal_id = sample_id #+ "_N"
         tumor_samfile = pysam.AlignmentFile(tumor_in, "rb")
         normal_samfile = pysam.AlignmentFile(normal_in, "rb")
         tumor_id = tumor_samfile.header['RG'][0]['SM']
