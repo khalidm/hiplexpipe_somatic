@@ -10,6 +10,7 @@ as config, options, DRMAA and the logger.
 from utils import safe_make_dir
 from runner import run_stage
 import os
+import pysam
 
 # PICARD_JAR = '$PICARD_HOME/lib/picard-1.69.jar'
 # PICARD_JAR = '/vlsci/VR0002/kmahmood/Programs/Picard/picard-tools-2.8.3/picard.jar'
@@ -165,11 +166,17 @@ class Stages(object):
         run_stage(self.state, 'index_sort_bam_picard', command)
 
     # coverage bam
-    def call_mutect2_gatk(self, inputs, sample_id, vcf_out):
+    def call_mutect2_gatk(self, inputs, vcf_out):
         '''Call somatic variants from using MuTect2'''
         tumor_in, normal_in = inputs
-        tumor_id = sample_id + "_T"
-        normal_id = sample_id + "_N"
+        tumor_id = sample_id #+ "_T"
+        normal_id = sample_id #+ "_N"
+        tumor_samfile = pysam.AlignmentFile(tumor_in, "rb")
+        normal_samfile = pysam.AlignmentFile(normal_in, "rb")
+        tumor_id = tumor_samfile.header['RG'][0]['SM']
+        normal_id = normal_samfile.header['RG'][0]['SM']
+        tumor_samfile.close()
+        normal_samfile.close()
         # safe_make_dir('variants/mutect2/{sample}'.format(sample=sample_id))
         safe_make_dir('variants/mutect2/')
         command = "gatk Mutect2 -R {reference} " \

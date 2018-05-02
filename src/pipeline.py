@@ -112,7 +112,7 @@ def make_pipeline(state):
         filter=formatter('.+/(?P<sample>[a-zA-Z0-9-]+)_T.primary.primerclipped.bam'),
         add_inputs=add_inputs(
             '{path[0]}/{sample[0]}_N.primary.primerclipped.bam'),
-        extras=['{sample[0]}'],
+        # extras=['{sample[0]}'],
         output='variants/mutect2/{sample[0]}.mutect2.vcf')
         # .follows('clip_bam')
 
