@@ -49,6 +49,7 @@ class Stages(object):
         self.vt_path = self.get_options('vt_path')
         self.coord_file = self.get_options('coord_file')
         self.target_bed = self.get_options('target_bed')
+        self.gatk_bed = self.get_options('gatk_bed')
         # self.interval_file = self.get_options('interval_file')
         self.primer_file = self.get_options('primer_file')
         self.primer_bedpe_file = self.get_options('primer_bedpe_file')
@@ -185,12 +186,14 @@ class Stages(object):
             "--germline-resource {mutect2_gnomad} " \
             "--af-of-alleles-not-in-resource 0.00003125 " \
             "-O {out} " \
+            "-L {gatk_bed} " \
             "--dont-use-soft-clipped-bases".format(reference=self.reference,
                         tumor_in=tumor_in,
                         normal_in=normal_in,
                         tumor_id=tumor_id,
                         normal_id=normal_id,
                         mutect2_gnomad=self.mutect2_gnomad,
+                        gatk_bed=self.gatk_bed,
                         out=vcf_out)
         run_stage(self.state, 'call_mutect2_gatk', command)
 
