@@ -134,9 +134,9 @@ def make_pipeline(state):
         task_func=stages.apply_vep,
         name='apply_vep',
         input=output_from('apply_vt'),
-        filter=suffix('.raw.annotate.filtered_lenient.norm.vcf'),
+        filter=suffix('.mutect2.vt.vcf'),
         # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-        output='.raw.annotate.filtered_lenient.norm.vep.vcf')
+        output='.mutect2.vt.vep.vcf')
         .follows('apply_vt'))
     #
     # # Apply SnpEff
@@ -153,11 +153,11 @@ def make_pipeline(state):
     (pipeline.transform(
         task_func=stages.apply_vcfanno,
         name='apply_vcfanno',
-        input=output_from('apply_snpeff'),
-        filter=suffix('.raw.annotate.filtered_lenient.norm.vep.snpeff.vcf'),
+        input=output_from('apply_vep'),
+        filter=suffix('.mutect2.vt.vep.vcf'),
         # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-        output='.annotated.vcf')
-        .follows('apply_snpeff'))
+        output='.mutect2.annotated.vcf')
+        .follows('apply_vep'))
     #
     # # -------- VEP ----------
     #

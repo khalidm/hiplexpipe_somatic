@@ -198,34 +198,6 @@ class Stages(object):
                         out=vcf_out)
         run_stage(self.state, 'call_mutect2_gatk', command)
 
-    # # Merge per lane bam into a single bam per sample
-    # def merge_sample_bams(self, bam_files_in, bam_out):
-    #     '''Merge per lane bam into a merged bam file'''
-    #     bam_files = ' '.join(['INPUT=' + bam for bam in bam_files_in])
-    #     picard_args = 'MergeSamFiles {bams_in} OUTPUT={merged_bam_out} ' \
-    #                   'VALIDATION_STRINGENCY=LENIENT ' \
-    #                   'MAX_RECORDS_IN_RAM=5000000 ASSUME_SORTED=True ' \
-    #                   'CREATE_INDEX=True'.format(
-    #                       bams_in=bam_files, merged_bam_out=bam_out)
-    #     self.run_picard('merge_sample_bams', picard_args)
-
-    # coverage bam interval
-    # def target_coverage_bamutil_interval(self, bam_in, coverage_out):
-    #     '''Calculate target coverage using bamutil'''
-    #     command = 'bam stats --basic --in {bam_in} --regionList {fragment_bed} &> {coverage_out}'.format(
-    #                       bam_in=bam_in, fragment_bed = self.fragment_bed, coverage_out=coverage_out)
-    #     run_stage(self.state, 'target_coverage_bamutil_interval', command)
-
-    # multicov
-    def apply_multicov(self, bam_in, multicov):
-        '''Samtools mpileup'''
-        # bam_in = bam_in
-        bams = ' '.join([bam for bam in bam_in])
-        safe_make_dir('coverage')
-        command = 'bedtools multicov -bams {bams} -bed {target_bed} > {multicov}'.format(
-                          bams=bams, target_bed=self.target_bed, multicov=multicov)
-        run_stage(self.state, 'apply_multicov', command)
-
     # multicov plots
     def apply_multicov_plots(self, bam_in, multicov):
         '''Generate multicov plots'''
