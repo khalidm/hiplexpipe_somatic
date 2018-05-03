@@ -12,8 +12,6 @@ from runner import run_stage
 import os
 import pysam
 
-# PICARD_JAR = '$PICARD_HOME/lib/picard-1.69.jar'
-# PICARD_JAR = '/vlsci/VR0002/kmahmood/Programs/Picard/picard-tools-2.8.3/picard.jar'
 PICARD_JAR = '/usr/local/easybuild/software/picard/2.3.0/picard.jar'
 SNPEFF_JAR = '/usr/local/easybuild/software/snpEff/4.1d-Java-1.7.0_80/snpEff.jar'
 
@@ -41,22 +39,15 @@ class Stages(object):
         self.one_k_g_indels = self.get_options('one_k_g_indels')
         self.one_k_g_highconf_snps = self.get_options('one_k_g_highconf_snps')
         self.hapmap = self.get_options('hapmap')
-        # self.interval_hg19 = self.get_options('exome_bed_hg19')
-        # self.CEU_mergeGvcf = self.get_options('CEU_mergeGvcf')
         self.snpeff_conf = self.get_options('snpeff_conf')
         self.bamclipper = self.get_options('bamclipper')
         self.vep_path = self.get_options('vep_path')
         self.vt_path = self.get_options('vt_path')
-        # self.coord_file = self.get_options('coord_file')
-        #self.target_bed = self.get_options('target_bed')
         self.gatk_bed = self.get_options('gatk_bed')
-        #self.interval_file = self.get_options('interval_file')
-        #self.primer_file = self.get_options('primer_file')
         self.primer_bedpe_file = self.get_options('primer_bedpe_file')
         self.proportionthresh = self.get_options('proportionthresh')
         self.absthresh = self.get_options('absthresh')
         self.maxvariants = self.get_options('maxvariants')
-        # self.fragment_bed = self.get_options('fragment_bed')
         self.annolua = self.get_options('annolua')
         self.anno = self.get_options('anno')
         self.hrfile = self.get_options('hrfile')
@@ -64,9 +55,6 @@ class Stages(object):
         self.snpeff_path = self.get_options('snpeff_path')
         self.mutect2_gnomad = self.get_options('mutect2_gnomad')
         self.vcfanno = self.get_options('vcfanno')
-
-        # self.GBR_mergeGvcf = self.get_options('GBR_mergeGvcf')
-        # self.FIN_mergeGvcf = self.get_options('FIN_mergeGvcf')
 
     def run_picard(self, stage, args):
         mem = int(self.state.config.get_stage_options(stage, 'mem'))
