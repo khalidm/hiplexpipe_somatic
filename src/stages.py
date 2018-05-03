@@ -47,8 +47,8 @@ class Stages(object):
         self.bamclipper = self.get_options('bamclipper')
         self.vep_path = self.get_options('vep_path')
         self.vt_path = self.get_options('vt_path')
-        self.coord_file = self.get_options('coord_file')
-        self.target_bed = self.get_options('target_bed')
+        # self.coord_file = self.get_options('coord_file')
+        #self.target_bed = self.get_options('target_bed')
         self.gatk_bed = self.get_options('gatk_bed')
         # self.interval_file = self.get_options('interval_file')
         self.primer_file = self.get_options('primer_file')
@@ -60,9 +60,10 @@ class Stages(object):
         self.annolua = self.get_options('annolua')
         self.anno = self.get_options('anno')
         self.hrfile = self.get_options('hrfile')
-        self.other_vep = self.get_options('other_vep')
+        self.vep_cache = self.get_options('vep_cache')
         self.snpeff_path = self.get_options('snpeff_path')
         self.mutect2_gnomad = self.get_options('mutect2_gnomad')
+        self.vcfanno = self.get_options('vcfanno')
 
         # self.GBR_mergeGvcf = self.get_options('GBR_mergeGvcf')
         # self.FIN_mergeGvcf = self.get_options('FIN_mergeGvcf')
@@ -195,7 +196,7 @@ class Stages(object):
                         mutect2_gnomad=self.mutect2_gnomad,
                         gatk_bed=self.gatk_bed,
                         out=vcf_out)
-        # "--af-of-alleles-not-in-resource 0.00003125 " \                
+        # "--af-of-alleles-not-in-resource 0.00003125 " \
         run_stage(self.state, 'call_mutect2_gatk', command)
 
     # multicov plots
@@ -225,10 +226,10 @@ class Stages(object):
         '''Apply NORM'''
         vcf_in = inputs
         cores = self.get_stage_options('apply_vt', 'cores')
-        vt_command = "{vt_path} decompose -s {vcf_in} - | {vt_path2} normalize -r {reference} - | " \
-                    "{vt_path3} uniq - -o {vcf_out}".format(
+        vt_command = "{vt_path} decompose -s {vcf_in} - | {vt_path2} normalize -r {reference} " \
+                    "-o {vcf_out} - ".format(
                     vt_path=self.vt_path, vcf_in=vcf_in, vt_path2=self.vt_path, reference=self.reference,
-                    vt_path3=self.vt_path, vcf_out=vcf_out)
+                    vcf_out=vcf_out)
         run_stage(self.state, 'apply_vt', vt_command)
 
     def apply_vep(self, inputs, vcf_out):
@@ -239,7 +240,7 @@ class Stages(object):
             "--cache " \
             "--refseq " \
             "--offline " \
-            "--dir_cache {other_vep} " \
+            "--dir_cache {vep_cache} " \
             "--fasta {reference} " \
             "-i {vcf_in} " \
             "-o {vcf_out} " \
@@ -287,8 +288,8 @@ class Stages(object):
         '''Apply anno'''
         vcf_in = inputs
         #cores = self.get_stage_options('apply_snpeff', 'cores')
-        anno_command = "./vcfanno_linux64 -lua {annolua} {anno} {vcf_in} > {vcf_out}".format(
-                    annolua=self.annolua, anno=self.anno, vcf_in=vcf_in, vcf_out=vcf_out)
+        anno_command = "{vcfanno} -lua {annolua} {anno} {vcf_in} > {vcf_out}".format(
+                    vcfanno=self.vcfanno, annolua=self.annolua, anno=self.anno, vcf_in=vcf_in, vcf_out=vcf_out)
         run_stage(self.state, 'apply_vcfanno', anno_command)
 
     def apply_cat_vcf(self, inputs, vcf_out):
