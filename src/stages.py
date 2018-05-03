@@ -184,7 +184,8 @@ class Stages(object):
             "-I {normal_in} " \
             "-normal {normal_id} " \
             "--germline-resource {mutect2_gnomad} " \
-            "--af-of-alleles-not-in-resource 0.00003125 " \
+            "--af-of-alleles-not-in-resource 0.001 " \
+            # "--af-of-alleles-not-in-resource 0.00003125 " \
             "-O {out} " \
             "-L {gatk_bed} " \
             "--dont-use-soft-clipped-bases".format(reference=self.reference,
@@ -248,26 +249,6 @@ class Stages(object):
                           output=output)
         run_stage(self.state, 'apply_summarize_picard', command)
 
-    # samtools
-    def apply_samtools_mpileup(self, bam_in, mpileup_out_bcf):
-        '''Samtools mpileup'''
-        # bam_in = bam_in
-        bams = ' '.join([bam for bam in bam_in])
-        safe_make_dir('variants')
-        command = 'samtools mpileup -t DP,AD,ADF,ADR,SP,INFO/AD,INFO/ADF,INFO/ADR -go {mpileup_out_bcf} ' \
-                  '-f {reference} {bams}'.format(
-                          mpileup_out_bcf=mpileup_out_bcf,reference=self.reference,bams=bams)
-        run_stage(self.state, 'apply_samtools_mpileup', command)
-
-    # bcftools
-    def apply_bcftools(self, mpileup_in, vcf_out):
-        '''Bcftools call variants'''
-        mpileup_in = mpileup_in
-        # mpileup_in = ' '.join([vcf for vcf in vcf_files_in])
-        command = 'bcftools call -vmO v -o {vcf_out} {mpileup_in}'.format(
-                          vcf_out=vcf_out,mpileup_in=mpileup_in)
-        run_stage(self.state, 'apply_bcftools', command)
-
     def apply_vt(self, inputs, vcf_out):
         '''Apply NORM'''
         vcf_in = inputs
@@ -282,13 +263,31 @@ class Stages(object):
         '''Apply VEP'''
         vcf_in = inputs
         cores = self.get_stage_options('apply_vep', 'cores')
-        vep_command = "{vep_path}/variant_effect_predictor.pl --cache --refseq --offline {other_vep} --fasta {reference} " \
-                    "-i {vcf_in} --sift b --polyphen b --symbol --numbers --biotype --total_length --hgvs " \
-                    "--format vcf -o {vcf_vep} --force_overwrite --vcf " \
-                    "--fields Consequence,Codons,Amino_acids,Gene,SYMBOL,Feature,EXON,PolyPhen,SIFT," \
-                    "Protein_position,BIOTYPE,HGVSc,HGVSp,cDNA_position,CDS_position,HGVSc,HGVSp,cDNA_position,CDS_position,PICK " \
-                    "--fork {threads} --flag_pick".format(
-                    reference=self.reference, vep_path=self.vep_path, vcf_in=vcf_in, vcf_vep=vcf_out, other_vep=self.other_vep, threads=cores)
+        vep_command = "{vep_path}/vep " \
+            "--cache " \
+            "--refseq " \
+            "--offline " \
+            "--dir_cache {other_vep} " \
+            "--fasta {reference} " \
+            "-i {vcf_in} " \
+            "-o {vcf_out} " \
+            "--sift b --polyphen b --symbol --numbers --biotype --total_length --hgvs " \
+            "--exclude_predicted " \
+            "--af_gnomad " \
+            "--format vcf " \
+            "--force_overwrite --vcf " \
+            "--fields Consequence,IMPACT,Codons,Amino_acids,Gene,SYMBOL,Feature,EXON,PolyPhen,SIFT," \
+            "Protein_position,BIOTYPE,HGVSc,HGVSp,cDNA_position,CDS_position," \
+            "gnomAD_AF,gnomAD_AFR_AF,gnomAD_AMR_AF,gnomAD_ASJ_AF,gnomAD_EAS_AF,gnomAD_FIN_AF,gnomAD_NFE_AF," \
+            "gnomAD_OTH_AF,gnomAD_SAS_AF," \
+            "MaxEntScan_alt,MaxEntScan_diff," \
+            "MaxEntScan_ref,GeneSplicer,PICK " \
+            "--fork {threads} " \
+            "--flag_pick " \
+            "--plugin MaxEntScan,/vlsci/UOM0040/shared/km/programs/ensembl-vep/data/MaxEntScan/ " \
+            "--plugin GeneSplicer,$GENE_SPLICER_PATH/bin/linux/genesplicer," \
+            "$GENE_SPLICER_PATH/human,context=100,tmpdir=/scratch/UOM0040/temp/".format(reference=self.reference,
+            vep_path=self.vep_path, vcf_in=vcf_in, vcf_vep=vcf_out, other_vep=self.other_vep, threads=cores)
         run_stage(self.state, 'apply_vep', vep_command)
 
     def apply_bcf(self, inputs, vcf_out):
@@ -311,16 +310,6 @@ class Stages(object):
                     vcf_in=vcf_in, vcf_out=vcf_out)
         run_stage(self.state, 'apply_snpeff', snpeff_command)
         #run_snpeff(self.state, 'apply_snpeff', snpeff_command)
-
-    # ORIGINAL WITH RUN_JAVA
-    # def apply_snpeff(self, inputs, vcf_out):
-    #     '''Apply SnpEFF'''
-    #     vcf_in = inputs
-    #     #cores = self.get_stage_options('apply_snpeff', 'cores')
-    #     snpeff_command = "eff -c {snpeff_conf} -canon GRCh37.75 {vcf_in} > {vcf_out}".format(
-    #                 snpeff_conf=self.snpeff_conf, vcf_in=vcf_in, vcf_out=vcf_out)
-    #     self.run_snpeff('apply_snpeff', snpeff_command)
-    #     #run_snpeff(self.state, 'apply_snpeff', snpeff_command)
 
     def apply_vcfanno(self, inputs, vcf_out):
         '''Apply anno'''

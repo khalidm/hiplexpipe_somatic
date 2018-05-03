@@ -119,25 +119,25 @@ def make_pipeline(state):
     ###### GATK VARIANT CALLING ######
 
     # -------- VEP ----------
-    # # Apply NORM
-    # (pipeline.transform(
-    #     task_func=stages.apply_vt,
-    #     name='apply_vt',
-    #     input=output_from('apply_variant_filtration_gatk_lenient'),
-    #     filter=suffix('.raw.annotate.filtered_lenient.vcf'),
-    #     # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-    #     output='.raw.annotate.filtered_lenient.norm.vcf')
-    #     .follows('apply_variant_filtration_gatk_lenient'))
+    # Apply NORM
+    (pipeline.transform(
+        task_func=stages.apply_vt,
+        name='apply_vt',
+        input=output_from('call_mutect2_gatk'),
+        filter=suffix('.mutect2.vcf'),
+        # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
+        output='.mutect2.vt.vcf')
+        .follows('call_mutect2_gatk'))
     #
-    # # Apply VEP
-    # (pipeline.transform(
-    #     task_func=stages.apply_vep,
-    #     name='apply_vep',
-    #     input=output_from('apply_vt'),
-    #     filter=suffix('.raw.annotate.filtered_lenient.norm.vcf'),
-    #     # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-    #     output='.raw.annotate.filtered_lenient.norm.vep.vcf')
-    #     .follows('apply_vt'))
+    # Apply VEP
+    (pipeline.transform(
+        task_func=stages.apply_vep,
+        name='apply_vep',
+        input=output_from('apply_vt'),
+        filter=suffix('.raw.annotate.filtered_lenient.norm.vcf'),
+        # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
+        output='.raw.annotate.filtered_lenient.norm.vep.vcf')
+        .follows('apply_vt'))
     #
     # # Apply SnpEff
     # (pipeline.transform(
@@ -149,15 +149,15 @@ def make_pipeline(state):
     #     output='.raw.annotate.filtered_lenient.norm.vep.snpeff.vcf')
     #     .follows('apply_vep'))
     #
-    # # Apply vcfanno
-    # (pipeline.transform(
-    #     task_func=stages.apply_vcfanno,
-    #     name='apply_vcfanno',
-    #     input=output_from('apply_snpeff'),
-    #     filter=suffix('.raw.annotate.filtered_lenient.norm.vep.snpeff.vcf'),
-    #     # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
-    #     output='.annotated.vcf')
-    #     .follows('apply_snpeff'))
+    # Apply vcfanno
+    (pipeline.transform(
+        task_func=stages.apply_vcfanno,
+        name='apply_vcfanno',
+        input=output_from('apply_snpeff'),
+        filter=suffix('.raw.annotate.filtered_lenient.norm.vep.snpeff.vcf'),
+        # add_inputs=add_inputs(['variants/ALL.indel_recal', 'variants/ALL.indel_tranches']),
+        output='.annotated.vcf')
+        .follows('apply_snpeff'))
     #
     # # -------- VEP ----------
     #
