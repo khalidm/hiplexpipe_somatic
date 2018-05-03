@@ -185,7 +185,6 @@ class Stages(object):
             "-normal {normal_id} " \
             "--germline-resource {mutect2_gnomad} " \
             "--af-of-alleles-not-in-resource 0.001 " \
-            # "--af-of-alleles-not-in-resource 0.00003125 " \
             "-O {out} " \
             "-L {gatk_bed} " \
             "--dont-use-soft-clipped-bases".format(reference=self.reference,
@@ -196,6 +195,7 @@ class Stages(object):
                         mutect2_gnomad=self.mutect2_gnomad,
                         gatk_bed=self.gatk_bed,
                         out=vcf_out)
+        # "--af-of-alleles-not-in-resource 0.00003125 " \                
         run_stage(self.state, 'call_mutect2_gatk', command)
 
     # multicov plots
