@@ -176,6 +176,7 @@ class Stages(object):
             "--af-of-alleles-not-in-resource 0.001 " \
             "-O {out} " \
             "-L {gatk_bed} " \
+            "--max-reads-per-alignment-start 0 " \
             "--dont-use-soft-clipped-bases".format(reference=self.reference,
                         tumor_in=tumor_in,
                         normal_in=normal_in,
